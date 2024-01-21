@@ -30,8 +30,8 @@
 		</licence>-->
     </metadata>
     <colors>
-		<headerBackground useBlackTextColor="False">$FFe7266d</headerBackground>
-		<iconBackground>$FFe7266d</iconBackground>
+		<headerBackground useBlackTextColor="False">$FFF1BA58</headerBackground>
+		<iconBackground>$FFF1BA58</iconBackground>
     </colors>
     <content>
 		<archive path="update\update.rpf" createIfNotExist="False" type="RPF7">
