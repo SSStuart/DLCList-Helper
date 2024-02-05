@@ -5,7 +5,7 @@ Simplifies the installation of add-on mods and the updating of the "mods" folder
 
 ![Preview of the console app and the generated OIV](./preview.png)
 
-The location of the game folder is detected automatically if the tool folder is :
+The location of the game folder is detected automatically if the tool's folder is :
 - in the game's folder
 - in the game folder's parent folder (next to the game folder)
 - if GTA 5 is installed in the default location (Steam/Epic Games/Rockstar)
