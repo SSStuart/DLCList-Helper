@@ -2,22 +2,26 @@
 using System.IO.Compression;
 using System.Xml;
 
-string toolPath;
-string pathRockstar = @"C:\Program Files\Rockstar Games\Grand Theft Auto V\";
-string pathSteam = @"C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\";
-string pathEpic = @"C:\Program Files\Epic Games\GTAV";
-string pathGTA = "ERROR";
-string pathInput;
-List<string> dlcpacks = new();
-int dlcpacksBaseCount = 0;
-bool detectedGameFolder = false;
-bool manualInput = false;
-var openIVexe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"New Technology Studio\Apps\OpenIV\OpenIV.exe");
+class Program
+{
+    private static string toolPath = "";
+    private static readonly string pathRockstar = @"C:\Program Files\Rockstar Games\Grand Theft Auto V\";
+    private static readonly string pathSteam = @"C:\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\";
+    private static readonly string pathEpic = @"C:\Program Files\Epic Games\GTAV";
+    private static string pathGTA = "ERROR";
+    private static string pathInput = "";
+    private static readonly List<string> dlcpacks = [];
+    private static int dlcpacksBaseCount = 0;
+    private static bool detectedGameFolder = false;
+    private static bool manualInput = false;
+    private static readonly string openIVexe = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"New Technology Studio\Apps\OpenIV\OpenIV.exe");
 
 
-
+    [STAThread]
+    static void Main(string[] args)
+    {
 Console.Title = "DLCList Helper";
-Console.WriteLine(  "   ┌------------------┐" +
+        Console.WriteLine("   ┌------------------┐" +
                   "\n   |  DLCList Helper  |   by SSStuart" +
                   "\n   └------------------┘\n" +
                   "  A small console app that generates the dlclist.xml file (GTA 5 modding) based on\n" +
@@ -27,7 +31,13 @@ Console.WriteLine(  "   ┌------------------┐" +
 
 
 // Récupération du chemin d'installation de l'outil
-toolPath = Directory.GetParent(Directory.GetCurrentDirectory()).FullName;
+        toolPath = Directory.GetParent(Directory.GetCurrentDirectory())?.FullName ?? "";
+        if (toolPath == "")
+        {
+            Console.WriteLine("[!] Unable to find the location of the app.");
+            Console.ReadKey();
+            Environment.Exit(0);
+        }
 Directory.CreateDirectory(Directory.GetCurrentDirectory() + @"\DLCListHelper_output\");
 string outputDirectory = Directory.GetCurrentDirectory() + @"\DLCListHelper_output\";
 // Suppression de l'ancien OIV
@@ -35,7 +45,8 @@ if (File.Exists(outputDirectory + @"\dlclistUpdate.oiv"))
     try
     {
         File.Delete(outputDirectory + @"\dlclistUpdate.oiv");
-    } catch (Exception e)
+            }
+            catch (Exception e)
     {
         Console.WriteLine("[!] Error while deleting old OIV file. Make sure to close OpenIV and retry.\n [i] Error details:");
         Console.WriteLine(e.Message);
@@ -45,35 +56,40 @@ if (File.Exists(outputDirectory + @"\dlclistUpdate.oiv"))
     
 
 // Détection du dossier d'installation du jeu
-if(File.Exists("../GTA5.exe"))  // Dossier parent
+        if (File.Exists("../GTA5.exe"))  // Dossier parent
 {
     pathGTA = toolPath;
     Console.WriteLine("[i] Parent directory is game folder (" + pathGTA + ").");
     detectedGameFolder = true;
-} else if (File.Exists("../GTAV/GTA5.exe"))  // Dossier côte à côte
+        }
+        else if (File.Exists("../GTAV/GTA5.exe"))  // Dossier côte à côte
 {
     pathGTA = toolPath + @"\GTAV";
     Console.WriteLine("[i] Detected sibling directory \"..\\GTAV\" as game folder (" + pathGTA + ").");
     detectedGameFolder = true;
-} else if (File.Exists("../Grand Theft Auto V/GTA5.exe"))  // Dossier côte à côte
+        }
+        else if (File.Exists("../Grand Theft Auto V/GTA5.exe"))  // Dossier côte à côte
 {
     pathGTA = toolPath + @"\Grand Theft Auto V";
     Console.WriteLine("[i] Detected sibling directory \"..\\Grand Theft Auto V\" as game folder (" + pathGTA + ").");
     detectedGameFolder = true;
-} else if (Directory.Exists(pathRockstar))  // Dossier par défaut (Rockstar)
+        }
+        else if (Directory.Exists(pathRockstar))  // Dossier par défaut (Rockstar)
 {
     pathGTA = pathRockstar;
     Console.WriteLine("[i] GTA5 (Rockstar) folder detected (" + pathGTA + ").");
     detectedGameFolder = true;
-} else if (Directory.Exists(pathSteam))  // Dossier par défaut (Steam)
+        }
+        else if (Directory.Exists(pathSteam))  // Dossier par défaut (Steam)
 {
     pathGTA = pathSteam;
     Console.WriteLine("[i] GTA5 (Steam) folder detected (" + pathGTA + ").");
     detectedGameFolder = true;
-} else if (Directory.Exists(pathEpic))  // Dossier par défaut (Epic Games)
+        }
+        else if (Directory.Exists(pathEpic))  // Dossier par défaut (Epic Games)
 {
     pathGTA = pathEpic;
-    Console.WriteLine("[i] GTA5 (Epic Games) folder detected ("+pathGTA+").");
+            Console.WriteLine("[i] GTA5 (Epic Games) folder detected (" + pathGTA + ").");
     detectedGameFolder = true;
 }
 
@@ -81,7 +97,7 @@ if(File.Exists("../GTA5.exe"))  // Dossier parent
 if (detectedGameFolder)
 {
     Console.WriteLine("[?] Continue with this folder ? [Y/N]");
-    if(Console.ReadKey().Key == ConsoleKey.N)
+            if (Console.ReadKey().Key == ConsoleKey.N)
         manualInput = true;
 }
 // Entrée manuelle du dossier
@@ -90,7 +106,7 @@ if (!detectedGameFolder || manualInput)
     do
     {
         Console.WriteLine("\n[>] Please enter the GTA5 folder path (You can also place the tool folder in the game folder directly, or in the parent folder to detect the game location automatically) : ");
-        pathInput = Console.ReadLine();
+                    pathInput = Console.ReadLine() ?? "";
     } while (!Directory.Exists(pathInput));
     pathGTA = pathInput;
 }
@@ -130,7 +146,8 @@ foreach (string dlcpack in dlcpacksList)
     {
         dlcpacks.Add(dlcpackName);
         Console.WriteLine($" - {dlcpackName}");
-    }else
+            }
+            else
     {
         Console.WriteLine($" - {dlcpackName} [ignored]");
     }
@@ -204,3 +221,5 @@ Process.Start("explorer.exe", outputDirectory);
 Console.WriteLine("\n\n[i] Please drag and drop the generated OIV file on OpenIV (with Edit mode enabled) and install it (or use \"Package Installer\").\n    Press any key to close the tool");
 Console.ReadKey();
 Environment.Exit(0);
+    }
+}
